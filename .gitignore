@@ -1,4 +1,4 @@
-HELP.md
+# Build directories / Dossiers de build
 target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
@@ -32,16 +32,19 @@ build/
 ### VS Code ###
 .vscode/
 
-# Arquivos sensíveis
+# Sensitive files / Fichiers sensibles
 /application.properties
 /serviceAccountKey.json
+/serviceAccountKey-prod.json
+/application-dev.properties
+/application-prod.properties
 
-# Arquivos de banco local H2
+# Local H2 database / Base de données locale H2
 *.db
 *.h2.db
 
-# Logs
+# Logs / Journaux
 *.log
 
-# Sistema operacional
+# Operating system / Système d'exploitation
 *.DS_Store
