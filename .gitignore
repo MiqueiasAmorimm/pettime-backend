@@ -33,11 +33,12 @@ build/
 .vscode/
 
 # Sensitive files / Fichiers sensibles
-/application.properties
+/application.propertiesgit push -u origin main
 /serviceAccountKey.json
 /serviceAccountKey-prod.json
 /application-dev.properties
 /application-prod.properties
+src/main/resources/firebase-credentials.json
 
 # Local H2 database / Base de données locale H2
 *.db
