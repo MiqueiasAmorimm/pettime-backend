@@ -18,6 +18,7 @@ target/
 *.iws
 *.iml
 *.ipr
+/out/
 
 ### NetBeans ###
 /nbproject/private/
@@ -33,7 +34,7 @@ build/
 .vscode/
 
 # Sensitive files / Fichiers sensibles
-/application.propertiesgit push -u origin main
+/application.properties
 /serviceAccountKey.json
 /serviceAccountKey-prod.json
 /application-dev.properties
@@ -46,6 +47,16 @@ src/main/resources/firebase-credentials.json
 
 # Logs / Journaux
 *.log
+logs/
 
 # Operating system / Système d'exploitation
 *.DS_Store
+
+# Maven artifacts
+*.jar
+*.war
+*.ear
+
+# Other temporary files
+*.tmp
+*.temp

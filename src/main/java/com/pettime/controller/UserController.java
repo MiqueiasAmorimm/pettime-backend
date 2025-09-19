@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
 
-    // Busca usuário por ID
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable String id) {
         try {
@@ -23,7 +22,7 @@ public class UserController {
         }
     }
 
-    // Busca usuário por e-mail (via query param, sem precisar %40)
+
     @GetMapping("/email")
     public ResponseEntity<User> getUserByEmail(@RequestParam String email) {
         try {
