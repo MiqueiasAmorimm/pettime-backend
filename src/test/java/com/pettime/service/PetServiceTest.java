@@ -13,15 +13,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Unit tests for PetService
- * Tests unitaires pour PetService
- */
-@ExtendWith(MockitoExtension.class)  // Modern JUnit 5 integration for Mockito
+@ExtendWith(MockitoExtension.class)
 class PetServiceTest {
 
     @InjectMocks
@@ -35,8 +31,6 @@ class PetServiceTest {
 
     @BeforeEach
     void setUp() {
-        // Initialize test data
-        // Initialiser les données de test
         owner = User.builder()
                 .id("user1")
                 .email("owner@example.com")
@@ -50,64 +44,72 @@ class PetServiceTest {
     }
 
     @Test
-    void testCreatePet() {
-        // Arrange: Mock repository save method
-        // Préparer : simuler la méthode save du repository
+    void shouldCreatePetWhenValid() {
+        // Arrange
         when(petRepository.save(any(Pet.class))).thenReturn(pet);
 
-        // Act: Create pet
-        // Exécuter : créer un animal
+        // Act
         Pet created = petService.createPet(pet, owner);
 
-        // Assert: Verify creation
-        // Vérifier : s'assurer de la création
-        assertNotNull(created);
-        assertEquals(owner, created.getOwner());
+        // Assert
+        assertThat(created).isNotNull();
+        assertThat(created.getOwner()).isEqualTo(owner);
+        assertThat(created.getName()).isEqualTo("Rex");
         verify(petRepository, times(1)).save(pet);
     }
 
     @Test
-    void testGetAllPets() {
+    void shouldReturnAllPets() {
         when(petRepository.findAll()).thenReturn(List.of(pet));
 
         List<Pet> pets = petService.getAllPets();
 
-        assertEquals(1, pets.size());
+        assertThat(pets).hasSize(1)
+                .first().isEqualTo(pet);
         verify(petRepository, times(1)).findAll();
     }
 
     @Test
-    void testGetPetById() {
+    void shouldReturnPetByIdWhenExists() {
         when(petRepository.findById(1L)).thenReturn(Optional.of(pet));
 
         Optional<Pet> result = petService.getPetById(1L);
 
-        assertTrue(result.isPresent());
-        assertEquals("Rex", result.get().getName());
+        assertThat(result).isPresent()
+                .contains(pet);
     }
 
     @Test
-    void testGetPetsByOwner() {
+    void shouldReturnEmptyWhenPetDoesNotExist() {
+        when(petRepository.findById(999L)).thenReturn(Optional.empty());
+
+        Optional<Pet> result = petService.getPetById(999L);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void shouldReturnPetsByOwner() {
         when(petRepository.findByOwner(owner)).thenReturn(List.of(pet));
 
         List<Pet> pets = petService.getPetsByOwner(owner);
 
-        assertEquals(1, pets.size());
-        assertEquals(owner, pets.get(0).getOwner());
+        assertThat(pets).hasSize(1)
+                .allMatch(p -> p.getOwner().equals(owner));
     }
 
     @Test
-    void testUpdatePet() {
+    void shouldUpdatePet() {
         when(petRepository.save(any(Pet.class))).thenReturn(pet);
 
         Pet updated = petService.updatePet(pet);
 
-        assertEquals(pet.getName(), updated.getName());
+        assertThat(updated.getName()).isEqualTo(pet.getName());
         verify(petRepository, times(1)).save(pet);
     }
 
     @Test
-    void testDeletePet() {
+    void shouldDeletePetById() {
         doNothing().when(petRepository).deleteById(1L);
 
         petService.deletePet(1L);
