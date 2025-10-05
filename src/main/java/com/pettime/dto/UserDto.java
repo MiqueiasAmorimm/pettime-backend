@@ -1,4 +1,4 @@
-package com.pettime.Dto;
+package com.pettime.dto;
 
 import com.pettime.model.User;
 import lombok.AllArgsConstructor;
