@@ -37,4 +37,9 @@ public class Pet {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    public String getSpecies() {
+        return this.type;
+    }
+
 }
