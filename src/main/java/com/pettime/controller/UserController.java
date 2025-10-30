@@ -1,15 +1,18 @@
 package com.pettime.controller;
 
+import com.pettime.dto.UserDto;
 import com.pettime.model.User;
 import com.pettime.service.UserService;
-import com.pettime.dto.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
+/**
+ * REST Controller for managing user endpoints.
+ * (FR) Contrôleur REST pour la gestion des points d’accès utilisateurs.
+ */
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
@@ -17,57 +20,63 @@ public class UserController {
 
     private final UserService userService;
 
-    // =========================
-    // GET all users
-    // =========================
+    /**
+     * Get all registered users.
+     * (FR) Récupère tous les utilisateurs enregistrés.
+     */
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
         List<User> users = userService.findAll();
         return ResponseEntity.ok(users);
     }
 
-    // =========================
-    // GET user by ID
-    // =========================
+    /**
+     * Get a single user by their ID.
+     * (FR) Récupère un utilisateur par son identifiant.
+     */
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
-        return userService.findByIdOptional(id)
+        return userService.findById(id)
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // =========================
-    // GET user by email
-    // =========================
+    /**
+     * Get a single user by email.
+     * (FR) Récupère un utilisateur par e-mail.
+     */
     @GetMapping("/email")
     public ResponseEntity<User> getUserByEmail(@RequestParam String email) {
-        return userService.findByEmailOptional(email)
+        return userService.findByEmail(email)
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // =========================
-    // CREATE user
-    // =========================
+    /**
+     * Create a new user.
+     * (FR) Crée un nouvel utilisateur.
+     */
     @PostMapping
     public ResponseEntity<User> createUser(@RequestBody UserDto userDto) {
         User createdUser = userService.createUser(userDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 
-    // =========================
-    // UPDATE user
-    // =========================
+    /**
+     * Update an existing user.
+     * (FR) Met à jour un utilisateur existant.
+     */
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody UserDto userDto) {
         return userService.updateUser(id, userDto)
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // =========================
-    // DELETE user
-    // =========================
+    /**
+     * Delete a user by ID.
+     * (FR) Supprime un utilisateur par identifiant.
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         boolean deleted = userService.deleteUser(id);
