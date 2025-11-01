@@ -32,7 +32,7 @@ class PetServiceTest {
     @BeforeEach
     void setUp() {
         owner = User.builder()
-                .id("user1")
+                .id(1L)
                 .email("owner@example.com")
                 .build();
 
@@ -42,6 +42,7 @@ class PetServiceTest {
                 .owner(owner)
                 .build();
     }
+
 
     @Test
     void shouldCreatePetWhenValid() {
@@ -73,7 +74,7 @@ class PetServiceTest {
     void shouldReturnPetByIdWhenExists() {
         when(petRepository.findById(1L)).thenReturn(Optional.of(pet));
 
-        Optional<Pet> result = petService.getPetById(1L);
+        Optional<Pet> result = Optional.ofNullable(petService.getPetById(1L));
 
         assertThat(result).isPresent()
                 .contains(pet);
@@ -83,7 +84,7 @@ class PetServiceTest {
     void shouldReturnEmptyWhenPetDoesNotExist() {
         when(petRepository.findById(999L)).thenReturn(Optional.empty());
 
-        Optional<Pet> result = petService.getPetById(999L);
+        Optional<Pet> result = Optional.ofNullable(petService.getPetById(999L));
 
         assertThat(result).isEmpty();
     }
