@@ -9,14 +9,20 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for PetService using Mockito and AssertJ.
+ * (FR) Tests unitaires pour PetService avec Mockito et AssertJ.
+ */
 @ExtendWith(MockitoExtension.class)
 class PetServiceTest {
 
@@ -43,19 +49,14 @@ class PetServiceTest {
                 .build();
     }
 
-
     @Test
     void shouldCreatePetWhenValid() {
-        // Arrange
         when(petRepository.save(any(Pet.class))).thenReturn(pet);
 
-        // Act
         Pet created = petService.createPet(pet, owner);
 
-        // Assert
         assertThat(created).isNotNull();
         assertThat(created.getOwner()).isEqualTo(owner);
-        assertThat(created.getName()).isEqualTo("Rex");
         verify(petRepository, times(1)).save(pet);
     }
 
@@ -65,8 +66,7 @@ class PetServiceTest {
 
         List<Pet> pets = petService.getAllPets();
 
-        assertThat(pets).hasSize(1)
-                .first().isEqualTo(pet);
+        assertThat(pets).hasSize(1).containsExactly(pet);
         verify(petRepository, times(1)).findAll();
     }
 
@@ -74,19 +74,23 @@ class PetServiceTest {
     void shouldReturnPetByIdWhenExists() {
         when(petRepository.findById(1L)).thenReturn(Optional.of(pet));
 
-        Optional<Pet> result = Optional.ofNullable(petService.getPetById(1L));
+        Pet found = petService.getPetById(1L);
 
-        assertThat(result).isPresent()
-                .contains(pet);
+        assertThat(found).isEqualTo(pet);
+        verify(petRepository, times(1)).findById(1L);
     }
 
     @Test
-    void shouldReturnEmptyWhenPetDoesNotExist() {
+    void shouldThrowNotFoundWhenPetDoesNotExist() {
         when(petRepository.findById(999L)).thenReturn(Optional.empty());
 
-        Optional<Pet> result = Optional.ofNullable(petService.getPetById(999L));
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> petService.getPetById(999L)
+        );
 
-        assertThat(result).isEmpty();
+        assertThat(exception.getStatusCode().value()).isEqualTo(404);
+        assertThat(exception.getReason()).contains("Pet not found with ID: 999");
     }
 
     @Test
@@ -95,26 +99,56 @@ class PetServiceTest {
 
         List<Pet> pets = petService.getPetsByOwner(owner);
 
-        assertThat(pets).hasSize(1)
-                .allMatch(p -> p.getOwner().equals(owner));
+        assertThat(pets).hasSize(1).allMatch(p -> p.getOwner().equals(owner));
+        verify(petRepository, times(1)).findByOwner(owner);
     }
 
     @Test
-    void shouldUpdatePet() {
+    void shouldUpdatePetWhenExists() {
+        when(petRepository.findById(1L)).thenReturn(Optional.of(pet));
         when(petRepository.save(any(Pet.class))).thenReturn(pet);
 
-        Pet updated = petService.updatePet(pet);
+        Pet updated = petService.updatePet(1L, pet);
 
-        assertThat(updated.getName()).isEqualTo(pet.getName());
+        assertThat(updated).isEqualTo(pet);
+        verify(petRepository, times(1)).findById(1L);
         verify(petRepository, times(1)).save(pet);
     }
 
     @Test
-    void shouldDeletePetById() {
-        doNothing().when(petRepository).deleteById(1L);
+    void shouldThrowWhenUpdatingNonExistingPet() {
+        when(petRepository.findById(999L)).thenReturn(Optional.empty());
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> petService.updatePet(999L, pet)
+        );
+
+        assertThat(exception.getStatusCode().value()).isEqualTo(404);
+        assertThat(exception.getReason()).contains("Pet not found with ID: 999");
+    }
+
+    @Test
+    void shouldDeletePetByIdWhenExists() {
+        when(petRepository.findById(1L)).thenReturn(Optional.of(pet));
+        doNothing().when(petRepository).delete(pet);
 
         petService.deletePet(1L);
 
-        verify(petRepository, times(1)).deleteById(1L);
+        verify(petRepository, times(1)).findById(1L);
+        verify(petRepository, times(1)).delete(pet);
+    }
+
+    @Test
+    void shouldThrowWhenDeletingNonExistingPet() {
+        when(petRepository.findById(999L)).thenReturn(Optional.empty());
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> petService.deletePet(999L)
+        );
+
+        assertThat(exception.getStatusCode().value()).isEqualTo(404);
+        assertThat(exception.getReason()).contains("Pet not found with ID: 999");
     }
 }
