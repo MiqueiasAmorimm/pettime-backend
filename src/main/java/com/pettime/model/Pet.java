@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-
 import java.time.LocalDateTime;
 
 @Entity
@@ -22,14 +21,14 @@ public class Pet {
     @Column(nullable = false)
     private String name;
 
-    private String type; // Dog, Cat, etc.
+    @Column(nullable = false)
+    private String species;
 
     private String breed;
-
     private Integer age;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner_id")
+    @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
 
     @CreationTimestamp
@@ -37,9 +36,4 @@ public class Pet {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
-
-    public String getSpecies() {
-        return this.type;
-    }
-
 }
