@@ -9,6 +9,10 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Global exception handler for PetTime API.
+ * (FR) Gestionnaire global des exceptions pour l’API PetTime.
+ */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
