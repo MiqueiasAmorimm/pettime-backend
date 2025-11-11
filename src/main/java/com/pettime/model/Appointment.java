@@ -7,68 +7,68 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
+import static jakarta.persistence.GenerationType.IDENTITY;
+
 @Entity
 @Table(name = "appointments")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString(exclude = {"pet", "petshop"})
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Appointment {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
-    // Unique identifier for the appointment
-    // Identifiant unique pour le rendez-vous
 
-    // Pet associated with the appointment
-    // Animal associé au rendez-vous
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "pet_id", nullable = false)
     private Pet pet;
 
-    // PetShop that will provide the service
-    // PetShop qui fournira le service
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "petshop_id", nullable = false)
     private User petshop;
 
-    // Appointment start time
-    // Heure de début du rendez-vous
     @Column(nullable = false)
     private LocalDateTime startTime;
 
-    // Appointment end time
-    // Heure de fin du rendez-vous
     @Column(nullable = false)
     private LocalDateTime endTime;
 
-    // Appointment status
-    // Statut du rendez-vous
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     private AppointmentStatus status;
 
-    // Payment status: true = 100%, false = 50% or not paid yet
-    // Statut du paiement : true = 100%, false = 50% ou non payé
     @Column(nullable = false)
     private Boolean paid;
 
-    // Automatically sets creation timestamp
-    // Horodatage de création automatique
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    // Automatically updates timestamp on modification
-    // Mise à jour automatique de l'horodatage lors de la modification
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    // Enum for appointment status
-    // Enum pour le statut du rendez-vous
+    /**
+     * Ensures endTime is always after startTime.
+     * (FR) Garantit que l'heure de fin est postérieure à l'heure de début.
+     */
+    public void validateTimeOrder() {
+        if (startTime != null && endTime != null && endTime.isBefore(startTime)) {
+            throw new IllegalArgumentException("endTime must be after startTime");
+        }
+    }
+
+    /**
+     * Enum representing appointment status.
+     * (FR) Énumération représentant le statut du rendez-vous.
+     */
     public enum AppointmentStatus {
-        SCHEDULED,   // Appointment is scheduled / Rendez-vous prévu
-        CANCELLED,   // Appointment is cancelled / Rendez-vous annulé
-        COMPLETED    // Appointment has been completed / Rendez-vous terminé
+        SCHEDULED,
+        CANCELLED,
+        COMPLETED
     }
 }
