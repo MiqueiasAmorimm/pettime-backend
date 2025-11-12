@@ -1,19 +1,24 @@
 package com.pettime.repository;
 
 import com.pettime.model.Appointment;
-import com.pettime.model.Pet;
-import com.pettime.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.Optional;
 
-@Repository
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
 
-
-    List<Appointment> findByPet(Pet pet);
-
-
-    List<Appointment> findByPetshop(User petshop);
+    @Query("""
+        SELECT a FROM Appointment a
+        WHERE a.petshop.id = :petshopId
+        AND a.startTime < :endTime
+        AND a.endTime > :startTime
+    """)
+    Optional<Appointment> findOverlappingAppointments(
+            @Param("petshopId") Long petshopId,
+            @Param("startTime") LocalDateTime startTime,
+            @Param("endTime") LocalDateTime endTime
+    );
 }
