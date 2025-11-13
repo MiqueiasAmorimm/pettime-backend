@@ -1,5 +1,6 @@
 package com.pettime.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.pettime.model.User;
 import com.pettime.model.UserRole;
 import jakarta.validation.constraints.Email;
@@ -12,7 +13,6 @@ import lombok.NoArgsConstructor;
 /**
  * Data Transfer Object for User entity.
  * (FR) Objet de transfert de données pour l'entité Utilisateur.
- * <p>
  * Provides bidirectional conversion between User and UserDto,
  * ensuring data integrity and clear separation between the API layer and the domain model.
  * (FR) Fournit une conversion bidirectionnelle entre User et UserDto,
@@ -22,7 +22,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
+
 public class UserDto {
+
+    /**
+     * Unique identifier of the user.
+     * (FR) Identifiant unique de l'utilisateur.
+     */
+    private Long id;
 
     /**
      * User's full name.
@@ -60,6 +68,7 @@ public class UserDto {
      */
     public User toEntity() {
         return User.builder()
+                .id(this.id) //
                 .name(this.name)
                 .email(this.email)
                 .password(this.password)
@@ -77,6 +86,7 @@ public class UserDto {
     public static UserDto fromEntity(User user) {
         if (user == null) return null;
         return UserDto.builder()
+                .id(user.getId())
                 .name(user.getName())
                 .email(user.getEmail())
                 .password(null) // 🚨 Never expose passwords in responses
