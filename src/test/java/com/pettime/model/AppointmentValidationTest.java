@@ -14,10 +14,10 @@ class AppointmentValidationTest {
     @DisplayName("Should validate time order and throw if endTime is before startTime")
     void shouldRejectInvalidEndTime() {
         // Arrange
-        Appointment appointment = Appointment.builder()
+        Appointment appointment = com.pettime.model.Appointment.builder()
                 .startTime(LocalDateTime.of(2025, 11, 8, 14, 0))
                 .endTime(LocalDateTime.of(2025, 11, 8, 13, 0))
-                .status(Appointment.AppointmentStatus.SCHEDULED)
+                .status(com.pettime.model.Appointment.AppointmentStatus.SCHEDULED)
                 .paid(false)
                 .build();
 
@@ -31,10 +31,10 @@ class AppointmentValidationTest {
     @DisplayName("Should pass validation when endTime is after startTime")
     void shouldAcceptValidEndTime() {
         // Arrange
-        Appointment appointment = Appointment.builder()
+        Appointment appointment = com.pettime.model.Appointment.builder()
                 .startTime(LocalDateTime.of(2025, 11, 8, 10, 0))
                 .endTime(LocalDateTime.of(2025, 11, 8, 12, 0))
-                .status(Appointment.AppointmentStatus.SCHEDULED)
+                .status(com.pettime.model.Appointment.AppointmentStatus.SCHEDULED)
                 .paid(true)
                 .build();
 

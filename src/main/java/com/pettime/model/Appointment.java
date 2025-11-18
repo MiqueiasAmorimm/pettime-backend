@@ -7,8 +7,10 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
-import static jakarta.persistence.GenerationType.IDENTITY;
-
+/**
+ * Represents a scheduled appointment between a pet and a petshop.
+ * (FR) Représente un rendez-vous planifié entre un animal et une animalerie.
+ */
 @Entity
 @Table(name = "appointments")
 @Getter
@@ -21,7 +23,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 public class Appointment {
 
     @Id
-    @GeneratedValue(strategy = IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
     private Long id;
 
@@ -54,7 +56,7 @@ public class Appointment {
 
     /**
      * Ensures endTime is always after startTime.
-     * (FR) Garantit que l'heure de fin est postérieure à l'heure de début.
+     * (FR) Vérifie que l'heure de fin est postérieure à l'heure de début.
      */
     public void validateTimeOrder() {
         if (startTime != null && endTime != null && endTime.isBefore(startTime)) {
@@ -63,12 +65,11 @@ public class Appointment {
     }
 
     /**
-     * Enum representing appointment status.
-     * (FR) Énumération représentant le statut du rendez-vous.
+     * Appointment status enum.
      */
     public enum AppointmentStatus {
         SCHEDULED,
-        CANCELLED,
-        COMPLETED
+        COMPLETED,
+        CANCELLED
     }
 }
