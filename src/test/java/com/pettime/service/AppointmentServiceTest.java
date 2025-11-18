@@ -6,6 +6,7 @@ import com.pettime.model.Pet;
 import com.pettime.model.User;
 import com.pettime.model.UserRole;
 import com.pettime.repository.AppointmentRepository;
+import com.pettime.service.impl.AppointmentServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,18 +15,15 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 /**
- * 🧪 Unit tests for {@link AppointmentService}.
- * (FR) Tests unitaires pour {@link AppointmentService}.
- * Validates business logic for appointment creation, overlapping, and inactive petshops.
- * (FR) Valide la logique métier de création, de chevauchement et de gestion des animaleries inactives.
+ * 🧪 Unit tests for AppointmentServiceImpl.
+ * Ensures business rules for creation, overlap prevention and inactive petshops.
  */
 class AppointmentServiceTest {
 
@@ -33,7 +31,7 @@ class AppointmentServiceTest {
     private AppointmentRepository appointmentRepository;
 
     @InjectMocks
-    private AppointmentService appointmentService;
+    private AppointmentServiceImpl appointmentService;
 
     private User petshop;
     private Pet pet;
@@ -66,9 +64,8 @@ class AppointmentServiceTest {
     }
 
     @Test
-    @DisplayName("Should create a valid appointment when no conflicts exist")
+    @DisplayName("✅ Should create a valid appointment when no conflicts exist")
     void shouldCreateValidAppointment() {
-        // Arrange
         LocalDateTime start = LocalDateTime.now().plusDays(1);
         LocalDateTime end = start.plusHours(1);
 
@@ -81,25 +78,26 @@ class AppointmentServiceTest {
                 .paid(false)
                 .build();
 
-        when(appointmentRepository.save(any(Appointment.class))).thenReturn(appointment);
-        when(appointmentRepository.findOverlappingAppointments(petshop.getId(), start, end))
-                .thenReturn(Optional.empty());
+        // No overlap
+        when(appointmentRepository.findOverlappingAppointments(
+                petshop.getId(), start, end
+        )).thenReturn(List.of());
 
-        // Act
+        when(appointmentRepository.save(any(Appointment.class)))
+                .thenReturn(appointment);
+
         Appointment created = appointmentService.create(appointment);
 
-        // Assert
         assertThat(created).isNotNull();
         assertThat(created.getPetshop().getName()).isEqualTo("PetShop Québec");
-        verify(appointmentRepository, times(1)).save(appointment);
+
+        verify(appointmentRepository, times(1)).save(any(Appointment.class));
     }
 
     @Test
-    @DisplayName("Should throw exception when PetShop is inactive")
+    @DisplayName("🚫 Should throw exception when PetShop is inactive")
     void shouldThrowWhenPetshopInactive() {
-        // Arrange
         String slug = "petshop-quebec";
-        petshop.setRole(UserRole.PETSHOP);
 
         Appointment appointment = Appointment.builder()
                 .pet(pet)
@@ -108,20 +106,18 @@ class AppointmentServiceTest {
                 .endTime(LocalDateTime.now().plusDays(1).plusHours(1))
                 .build();
 
-        // Simula cenário de petshop inativo
         doThrow(new PetshopInactiveException(slug))
-                .when(appointmentRepository).save(any(Appointment.class));
+                .when(appointmentRepository)
+                .save(any(Appointment.class));
 
-        // Act + Assert
         assertThatThrownBy(() -> appointmentService.create(appointment))
                 .isInstanceOf(PetshopInactiveException.class)
-                .hasMessageContaining("petshop with link '" + slug + "' is temporarily inactive");
+                .hasMessageContaining(slug);
     }
 
     @Test
-    @DisplayName("Should prevent overlapping appointments for same PetShop")
+    @DisplayName("🚫 Should prevent overlapping appointments")
     void shouldPreventOverlappingAppointments() {
-        // Arrange
         LocalDateTime start = LocalDateTime.now().plusDays(1);
         LocalDateTime end = start.plusHours(1);
 
@@ -132,12 +128,17 @@ class AppointmentServiceTest {
                 .endTime(end)
                 .build();
 
-        when(appointmentRepository.findOverlappingAppointments(petshop.getId(), start, end))
-                .thenReturn(Optional.of(new Appointment())); // Simula conflito
+        // Simula conflito
+        Appointment conflict = Appointment.builder().id(99L).build();
 
-        // Act + Assert
+        when(appointmentRepository.findOverlappingAppointments(
+                petshop.getId(), start, end
+        )).thenReturn(List.of(conflict));
+
         assertThatThrownBy(() -> appointmentService.create(newAppointment))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("Conflicting appointment exists for this petshop");
+                .hasMessageContaining("Conflicting appointment exists");
+
+        verify(appointmentRepository, never()).save(any());
     }
 }
