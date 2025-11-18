@@ -10,19 +10,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * 🧪 Tests for AppointmentRepository
- * (FR) Tests pour AppointmentRepository
+ * 🧪 Comprehensive tests for AppointmentRepository.
+ * (FR) Tests complets pour AppointmentRepository.
+ *
+ * Covers:
+ * - Persistence and basic retrieval
+ * - Overlapping appointment detection
+ * - Edge cases for no overlap
+ * - Ensures database constraints work as expected
  */
 @DataJpaTest
 class AppointmentRepositoryTest {
 
     @Autowired
-    private AppointmentRepository repository;
+    private AppointmentRepository appointmentRepository; // ✅ era Appointment
 
     @Autowired
     private UserRepository userRepository;
@@ -30,96 +36,161 @@ class AppointmentRepositoryTest {
     @Autowired
     private PetRepository petRepository;
 
-    @Test
-    @DisplayName("✅ should persist and find appointment by ID | (FR) doit enregistrer et retrouver un rendez-vous par ID")
-    void shouldPersistAndRetrieveAppointment() {
-        // Arrange
-        User petshop = userRepository.save(User.builder()
-                .name("PetShop Québec")
-                .email("shop@pettime.ca")
-                .password("123")
-                .role(UserRole.PETSHOP)
-                .build());
+    // =====================================================================
+    // Helpers
+    // =====================================================================
 
-        User client = userRepository.save(User.builder()
-                .name("Jean Dupont")
-                .email("jean@client.ca")
-                .password("123")
-                .role(UserRole.CLIENT)
-                .build());
-
-        Pet pet = petRepository.save(Pet.builder()
-                .name("Buddy")
-                .species("Dog")
-                .breed("Golden Retriever")
-                .owner(client)
-                .build());
-
-        Appointment appointment = Appointment.builder()
-                .pet(pet)
-                .petshop(petshop)
-                .startTime(LocalDateTime.now().plusHours(1))
-                .endTime(LocalDateTime.now().plusHours(2))
-                .status(Appointment.AppointmentStatus.SCHEDULED)
-                .paid(false)
-                .build();
-
-        Appointment saved = repository.save(appointment);
-
-        // Act
-        Optional<Appointment> found = repository.findById(saved.getId());
-
-        // Assert
-        assertThat(found).isPresent();
-        assertThat(found.get().getPetshop().getName()).isEqualTo("PetShop Québec");
-        assertThat(found.get().getStartTime()).isBefore(found.get().getEndTime());
+    /**
+     * Helper method to persist a User.
+     */
+    private User createUser(String name, String email, UserRole role) {
+        return userRepository.save(
+                User.builder()
+                        .name(name)
+                        .email(email)
+                        .password("123")
+                        .role(role)
+                        .build()
+        );
     }
 
+    /**
+     * Helper method to persist a Pet.
+     */
+    private Pet createPet(String name, User owner) {
+        return petRepository.save(
+                Pet.builder()
+                        .name(name)
+                        .species("Dog")
+                        .breed("Golden Retriever")
+                        .owner(owner)
+                        .build()
+        );
+    }
+
+    /**
+     * Helper method to persist an Appointment.
+     */
+    private Appointment createAppointment(Pet pet, User petshop, LocalDateTime start, LocalDateTime end) {
+        return appointmentRepository.save(
+                Appointment.builder()
+                        .pet(pet)
+                        .petshop(petshop)
+                        .startTime(start)
+                        .endTime(end)
+                        .status(Appointment.AppointmentStatus.SCHEDULED)
+                        .paid(false)
+                        .build()
+        );
+    }
+
+    // =====================================================================
+    // ✔ BASICS: Persist and Retrieve
+    // =====================================================================
+
     @Test
-    @DisplayName("🚫 should detect overlapping appointments | (FR) doit détecter les rendez-vous qui se chevauchent")
+    @DisplayName("✅ Should persist and retrieve appointment by ID")
+    void shouldPersistAndRetrieveAppointment() {
+        User petshop = createUser("PetShop Québec", "shop@pettime.ca", UserRole.PETSHOP);
+        User client = createUser("Jean Dupont", "jean@client.ca", UserRole.CLIENT);
+        Pet pet = createPet("Buddy", client);
+
+        Appointment saved = createAppointment(
+                pet,
+                petshop,
+                LocalDateTime.now().plusHours(1),
+                LocalDateTime.now().plusHours(2)
+        );
+
+        Appointment found = appointmentRepository.findById(saved.getId()).orElse(null);
+
+        assertThat(found).isNotNull();
+        assertThat(found.getPetshop().getName()).isEqualTo("PetShop Québec");
+        assertThat(found.getStartTime()).isBefore(found.getEndTime());
+    }
+
+    // =====================================================================
+    // ✔ OVERLAP DETECTION
+    // =====================================================================
+
+    @Test
+    @DisplayName("🚫 Should detect overlapping appointments")
     void shouldDetectOverlappingAppointments() {
-        // Arrange
-        User petshop = userRepository.save(User.builder()
-                .name("PetShop Québec")
-                .email("shop@pettime.ca")
-                .password("123")
-                .role(UserRole.PETSHOP)
-                .build());
 
-        User client = userRepository.save(User.builder()
-                .name("Jean Dupont")
-                .email("jean@client.ca")
-                .password("123")
-                .role(UserRole.CLIENT)
-                .build());
-
-        Pet pet = petRepository.save(Pet.builder()
-                .name("Rex")
-                .species("Dog")
-                .breed("Labrador")
-                .owner(client)
-                .build());
+        User petshop = createUser("PetShop Québec", "shop@pettime.ca", UserRole.PETSHOP);
+        User client = createUser("Jean Dupont", "jean@client.ca", UserRole.CLIENT);
+        Pet pet = createPet("Rex", client);
 
         LocalDateTime start = LocalDateTime.now().plusDays(1);
         LocalDateTime end = start.plusHours(2);
 
-        repository.save(Appointment.builder()
-                .pet(pet)
-                .petshop(petshop)
-                .startTime(start)
-                .endTime(end)
-                .status(Appointment.AppointmentStatus.SCHEDULED)
-                .paid(false)
-                .build());
+        createAppointment(pet, petshop, start, end);
 
-        // Act
-        Optional<Appointment> overlap = repository.findOverlappingAppointments(
+        List<Appointment> overlap = appointmentRepository.findOverlappingAppointments(
                 petshop.getId(),
                 start.plusMinutes(30),
                 end.plusMinutes(30)
         );
 
-        // Assert
-        assertThat(overlap).isPresent();
+        assertThat(overlap).isNotEmpty();
+    }
+
+    // =====================================================================
+    // ✔ NO-OVERLAP CASE
+    // =====================================================================
+
+    @Test
+    @DisplayName("✅ Should NOT detect overlap when appointments don't overlap")
+    void shouldNotDetectOverlap() {
+
+        User petshop = createUser("PetShop Québec", "shop@pettime.ca", UserRole.PETSHOP);
+        User client = createUser("Jean Dupont", "jean@client.ca", UserRole.CLIENT);
+        Pet pet = createPet("Rex", client);
+
+        LocalDateTime start = LocalDateTime.now().plusDays(1);
+        LocalDateTime end = start.plusHours(2);
+
+        createAppointment(pet, petshop, start, end);
+
+        List<Appointment> overlap = appointmentRepository.findOverlappingAppointments(
+                petshop.getId(),
+                end.plusMinutes(1),
+                end.plusHours(1)
+        );
+
+        assertThat(overlap).isEmpty();
+    }
+
+    // =====================================================================
+    // ✔ MULTIPLE APPOINTMENTS
+    // =====================================================================
+
+    @Test
+    @DisplayName("🔄 Should detect at least one overlapping appointment among multiple")
+    void shouldDetectClosestOverlappingAppointment() {
+
+        User petshop = createUser("PetShop Québec", "shop@pettime.ca", UserRole.PETSHOP);
+        User client = createUser("Jean Dupont", "jean@client.ca", UserRole.CLIENT);
+        Pet pet = createPet("Buddy", client);
+
+        LocalDateTime now = LocalDateTime.now().plusDays(1);
+
+        // A1: [now, now+1h]
+        createAppointment(pet, petshop, now, now.plusHours(1));
+        // A2: [now+2h, now+3h]
+        createAppointment(pet, petshop, now.plusHours(2), now.plusHours(3));
+        // A3: [now+4h, now+5h]
+        createAppointment(pet, petshop, now.plusHours(4), now.plusHours(5));
+
+        List<Appointment> overlap = appointmentRepository.findOverlappingAppointments(
+                petshop.getId(),
+                now.plusMinutes(30),
+                now.plusHours(2)
+        );
+
+        assertThat(overlap).isNotEmpty();
+
+        assertThat(overlap)
+                .anySatisfy(appt -> assertThat(appt.getStartTime()).isEqualTo(now));
     }
 }
