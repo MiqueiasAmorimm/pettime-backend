@@ -1,4 +1,4 @@
-package com.pettime.service;
+package com.pettime.service.impl;
 
 import com.pettime.exception.PetshopInactiveException;
 import com.pettime.model.Appointment;
@@ -6,26 +6,24 @@ import com.pettime.model.Pet;
 import com.pettime.model.User;
 import com.pettime.model.UserRole;
 import com.pettime.repository.AppointmentRepository;
-import com.pettime.service.impl.AppointmentServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
+import org.junit.jupiter.api.extension.ExtendWith;
+
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-/**
- * 🧪 Unit tests for AppointmentServiceImpl.
- * Ensures business rules for creation, overlap prevention and inactive petshops.
- */
-class AppointmentServiceTest {
+@ExtendWith(MockitoExtension.class)
+class AppointmentServiceImplTest {
 
     @Mock
     private AppointmentRepository appointmentRepository;
@@ -38,7 +36,6 @@ class AppointmentServiceTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
 
         petshop = User.builder()
                 .id(1L)
@@ -78,10 +75,9 @@ class AppointmentServiceTest {
                 .paid(false)
                 .build();
 
-        // No overlap
         when(appointmentRepository.findOverlappingAppointments(
                 petshop.getId(), start, end
-        )).thenReturn(List.of());
+        )).thenReturn(Collections.emptyList());
 
         when(appointmentRepository.save(any(Appointment.class)))
                 .thenReturn(appointment);
@@ -95,9 +91,10 @@ class AppointmentServiceTest {
     }
 
     @Test
-    @DisplayName("🚫 Should throw exception when PetShop is inactive")
+    @DisplayName("🚫 Should throw exception when Petshop is inactive")
     void shouldThrowWhenPetshopInactive() {
-        String slug = "petshop-quebec";
+
+        petshop.setEmail("inactive@pettime.ca");
 
         Appointment appointment = Appointment.builder()
                 .pet(pet)
@@ -106,13 +103,12 @@ class AppointmentServiceTest {
                 .endTime(LocalDateTime.now().plusDays(1).plusHours(1))
                 .build();
 
-        doThrow(new PetshopInactiveException(slug))
-                .when(appointmentRepository)
-                .save(any(Appointment.class));
+        when(appointmentRepository.findOverlappingAppointments(anyLong(), any(), any()))
+                .thenReturn(Collections.emptyList());
 
         assertThatThrownBy(() -> appointmentService.create(appointment))
                 .isInstanceOf(PetshopInactiveException.class)
-                .hasMessageContaining(slug);
+                .hasMessageContaining("petshop-slug");
     }
 
     @Test
@@ -128,12 +124,9 @@ class AppointmentServiceTest {
                 .endTime(end)
                 .build();
 
-        // Simula conflito
-        Appointment conflict = Appointment.builder().id(99L).build();
-
         when(appointmentRepository.findOverlappingAppointments(
                 petshop.getId(), start, end
-        )).thenReturn(List.of(conflict));
+        )).thenReturn(List.of(new Appointment()));
 
         assertThatThrownBy(() -> appointmentService.create(newAppointment))
                 .isInstanceOf(IllegalStateException.class)
