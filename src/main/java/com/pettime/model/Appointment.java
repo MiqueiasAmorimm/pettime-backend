@@ -1,5 +1,6 @@
 package com.pettime.model;
 
+
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -62,14 +63,5 @@ public class Appointment {
         if (startTime != null && endTime != null && endTime.isBefore(startTime)) {
             throw new IllegalArgumentException("endTime must be after startTime");
         }
-    }
-
-    /**
-     * Appointment status enum.
-     */
-    public enum AppointmentStatus {
-        SCHEDULED,
-        COMPLETED,
-        CANCELLED
     }
 }
