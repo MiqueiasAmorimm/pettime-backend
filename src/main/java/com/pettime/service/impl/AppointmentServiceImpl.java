@@ -1,10 +1,11 @@
 package com.pettime.service.impl;
 
+import com.pettime.exception.AppointmentConflictException;
 import com.pettime.exception.ResourceNotFoundException;
 import com.pettime.model.Appointment;
+import com.pettime.model.AppointmentStatus;
 import com.pettime.model.Pet;
 import com.pettime.model.User;
-import com.pettime.model.AppointmentStatus;
 import com.pettime.repository.AppointmentRepository;
 import com.pettime.repository.PetRepository;
 import com.pettime.repository.UserRepository;
@@ -48,7 +49,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         User petshop = userRepository.findById(petshopId)
                 .orElseThrow(() -> new ResourceNotFoundException("Petshop not found"));
 
-        // 5️⃣ Check overlapping appointments
+        // 4️⃣ Check overlapping appointments
         List<Appointment> overlaps =
                 appointmentRepository.findOverlappingAppointments(
                         petshopId,
@@ -57,12 +58,10 @@ public class AppointmentServiceImpl implements AppointmentService {
                 );
 
         if (!overlaps.isEmpty()) {
-            throw new IllegalStateException(
-                    "Conflicting appointment exists for this petshop"
-            );
+            throw new AppointmentConflictException();
         }
 
-        // 6️⃣ Build appointment (domain invariant enforced here)
+        // 5️⃣ Build appointment (domain invariant enforced here)
         Appointment appointment = Appointment.builder()
                 .pet(pet)
                 .petshop(petshop)
@@ -72,7 +71,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                 .paid(false)
                 .build();
 
-        // 7️⃣ Persist
+        // 6️⃣ Persist
         return appointmentRepository.save(appointment);
     }
 }
