@@ -27,7 +27,7 @@ public class AppointmentResponseDto {
                 .startTime(appointment.getStartTime())
                 .endTime(appointment.getEndTime())
                 .status(appointment.getStatus().name())
-                .paid(appointment.isPaid())
+                .paid(appointment.getPaid())
                 .build();
     }
 }
