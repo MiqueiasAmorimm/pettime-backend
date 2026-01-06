@@ -1,9 +1,6 @@
 package com.pettime.repository;
 
-import com.pettime.model.Appointment;
-import com.pettime.model.Pet;
-import com.pettime.model.User;
-import com.pettime.model.UserRole;
+import com.pettime.model.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * 🧪 Comprehensive tests for AppointmentRepository.
  * (FR) Tests complets pour AppointmentRepository.
- *
+
  * Covers:
  * - Persistence and basic retrieval
  * - Overlapping appointment detection
@@ -78,11 +75,11 @@ class AppointmentRepositoryTest {
                         .petshop(petshop)
                         .startTime(start)
                         .endTime(end)
-                        .status(Appointment.AppointmentStatus.SCHEDULED)
+                        .status(AppointmentStatus.PENDING)
                         .paid(false)
                         .build()
         );
-    }
+}
 
     // =====================================================================
     // ✔ BASICS: Persist and Retrieve
