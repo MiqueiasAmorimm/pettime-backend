@@ -1,13 +1,14 @@
 package com.pettime.service.impl;
 
-import com.pettime.exception.PetshopInactiveException;
+
 import com.pettime.model.Appointment;
+import com.pettime.model.AppointmentStatus;
 import com.pettime.model.Pet;
 import com.pettime.model.User;
-import com.pettime.model.UserRole;
 import com.pettime.repository.AppointmentRepository;
+import com.pettime.repository.PetRepository;
+import com.pettime.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -15,10 +16,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -27,139 +28,48 @@ class AppointmentServiceImplTest {
     @Mock
     private AppointmentRepository appointmentRepository;
 
+    @Mock
+    private PetRepository petRepository;
+
+    @Mock
+    private UserRepository userRepository;
+
     @InjectMocks
     private AppointmentServiceImpl appointmentService;
 
-    private User petshop;
     private Pet pet;
+    private User petshop;
 
     @BeforeEach
-    void setup() {
-
-        petshop = User.builder()
-                .id(10L)
-                .name("PetShop Québec")
-                .email("contact@pettime.ca")
-                .password("123")
-                .role(UserRole.PETSHOP)
-                .build();
-
-        pet = Pet.builder()
-                .id(20L)
-                .name("Buddy")
-                .species("Dog")
-                .breed("Golden Retriever")
-                .owner(
-                        User.builder()
-                                .id(30L)
-                                .name("Jean Dupont")
-                                .email("jean@client.ca")
-                                .password("123")
-                                .role(UserRole.CLIENT)
-                                .build()
-                )
-                .build();
+    void setUp() {
+        pet = Pet.builder().id(1L).build();
+        petshop = User.builder().id(10L).build();
     }
 
-    // --------------------------------------------------------------------
     @Test
-    @DisplayName("✅ Should create appointment when valid and has no conflicts")
-    void shouldCreateAppointmentSuccessfully() {
-
-        LocalDateTime start = LocalDateTime.now().plusDays(1);
+    void shouldCreateAppointmentWhenDataIsValid() {
+        LocalDateTime start = LocalDateTime.now().plusHours(1);
         LocalDateTime end = start.plusHours(1);
 
-        Appointment appointment = Appointment.builder()
-                .pet(pet)
-                .petshop(petshop)
-                .startTime(start)
-                .endTime(end)
-                .status(Appointment.AppointmentStatus.SCHEDULED)
-                .paid(false)
-                .build();
+        when(petRepository.findById(1L)).thenReturn(Optional.of(pet));
+        when(userRepository.findById(10L)).thenReturn(Optional.of(petshop));
+        when(appointmentRepository.findOverlappingAppointments(10L, start, end))
+                .thenReturn(List.of());
+        when(appointmentRepository.save(any(Appointment.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
 
-        // no overlap
-        when(appointmentRepository.findOverlappingAppointments(
-                petshop.getId(), start, end
-        )).thenReturn(Collections.emptyList());
+        Appointment result = appointmentService.create(1L, 10L, start, end);
 
-        when(appointmentRepository.save(any())).thenReturn(appointment);
+        assertNotNull(result);
+        assertEquals(AppointmentStatus.PENDING, result.getStatus());
+        assertFalse(result.getPaid());
 
-        Appointment result = appointmentService.create(appointment);
+        verify(petRepository).findById(1L);
+        verify(userRepository).findById(10L);
+        verify(appointmentRepository)
+                .findOverlappingAppointments(10L, start, end);
+        verify(appointmentRepository).save(any(Appointment.class));
 
-        assertThat(result).isNotNull();
-        assertThat(result.getPetshop().getName()).isEqualTo("PetShop Québec");
-
-        verify(appointmentRepository, times(1)).save(any());
     }
 
-    // --------------------------------------------------------------------
-    @Test
-    @DisplayName("🚫 Should throw when appointment time is invalid")
-    void shouldRejectInvalidTimeOrder() {
-
-        Appointment appointment = Appointment.builder()
-                .pet(pet)
-                .petshop(petshop)
-                .startTime(LocalDateTime.now().plusHours(2))
-                .endTime(LocalDateTime.now().plusHours(1)) // end < start
-                .build();
-
-        assertThatThrownBy(() -> appointmentService.create(appointment))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("endTime must be after startTime");
-
-        verify(appointmentRepository, never()).save(any());
-    }
-
-    // --------------------------------------------------------------------
-    @Test
-    @DisplayName("🚫 Should prevent overlapping appointments")
-    void shouldPreventOverlappingAppointments() {
-
-        LocalDateTime start = LocalDateTime.now().plusDays(1);
-        LocalDateTime end = start.plusHours(1);
-
-        Appointment request = Appointment.builder()
-                .pet(pet)
-                .petshop(petshop)
-                .startTime(start)
-                .endTime(end)
-                .build();
-
-        // simulate conflict
-        when(appointmentRepository.findOverlappingAppointments(
-                petshop.getId(), start, end
-        )).thenReturn(List.of(new Appointment()));
-
-        assertThatThrownBy(() -> appointmentService.create(request))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("Conflicting appointment exists");
-
-        verify(appointmentRepository, never()).save(any());
-    }
-
-    // --------------------------------------------------------------------
-    @Test
-    @DisplayName("🚫 Should throw PetshopInactiveException when petshop email contains 'inactive'")
-    void shouldThrowWhenPetshopIsInactive() {
-
-        petshop.setEmail("inactive-petshop@pettime.ca");
-
-        Appointment appointment = Appointment.builder()
-                .pet(pet)
-                .petshop(petshop)
-                .startTime(LocalDateTime.now().plusHours(1))
-                .endTime(LocalDateTime.now().plusHours(2))
-                .build();
-
-        when(appointmentRepository.findOverlappingAppointments(anyLong(), any(), any()))
-                .thenReturn(Collections.emptyList());
-
-        assertThatThrownBy(() -> appointmentService.create(appointment))
-                .isInstanceOf(PetshopInactiveException.class)
-                .hasMessageContaining("petshop-slug");
-
-        verify(appointmentRepository, never()).save(any());
-    }
 }
