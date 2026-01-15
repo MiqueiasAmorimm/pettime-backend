@@ -36,18 +36,19 @@ public class AppointmentServiceImpl implements AppointmentService {
             LocalDateTime endTime
     ) {
 
-        // 1️⃣ Validate time window
+        // 1️⃣ Load pet
+        Pet pet = petRepository.findById(petId)
+                .orElseThrow(() -> new ResourceNotFoundException("Pet not found"));
+
+        // 2️⃣ Load petshop
+        User petshop = userRepository.findById(petshopId)
+                .orElseThrow(() -> new ResourceNotFoundException("Petshop not found"));
+
+        // 3️⃣ Validate time window
         if (!startTime.isBefore(endTime)) {
             throw new IllegalArgumentException("startTime must be before endTime");
         }
 
-        // 2️⃣ Load pet
-        Pet pet = petRepository.findById(petId)
-                .orElseThrow(() -> new ResourceNotFoundException("Pet not found"));
-
-        // 3️⃣ Load petshop
-        User petshop = userRepository.findById(petshopId)
-                .orElseThrow(() -> new ResourceNotFoundException("Petshop not found"));
 
         // 4️⃣ Check overlapping appointments
         List<Appointment> overlaps =
