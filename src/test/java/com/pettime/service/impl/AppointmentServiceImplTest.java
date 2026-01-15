@@ -1,6 +1,7 @@
 package com.pettime.service.impl;
 
 
+import com.pettime.exception.ResourceNotFoundException;
 import com.pettime.model.Appointment;
 import com.pettime.model.AppointmentStatus;
 import com.pettime.model.Pet;
@@ -70,6 +71,41 @@ class AppointmentServiceImplTest {
                 .findOverlappingAppointments(10L, start, end);
         verify(appointmentRepository).save(any(Appointment.class));
 
+    }
+
+    @Test
+    void shouldThrowWhenPetNotFound() {
+        LocalDateTime start = LocalDateTime.now().plusHours(1);
+        LocalDateTime end = start.plusHours(1);
+
+        when(petRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(
+                ResourceNotFoundException.class,
+                () -> appointmentService.create(1L, 10L, start, end)
+        );
+
+        verify(petRepository).findById(1L);
+        verifyNoInteractions(userRepository);
+        verify(appointmentRepository, never()).save(any());
+    }
+
+    @Test
+    void shouldThrowWhenPetshopNotFound() {
+        LocalDateTime start = LocalDateTime.now().plusHours(1);
+        LocalDateTime end = start.plusHours(1);
+
+        when(petRepository.findById(1L)).thenReturn(Optional.of(pet));
+        when(userRepository.findById(10L)).thenReturn(Optional.empty());
+
+        assertThrows(
+                ResourceNotFoundException.class,
+                () -> appointmentService.create(1L, 10L, start, end)
+        );
+
+        verify(petRepository).findById(1L);
+        verify(userRepository).findById(10L);
+        verifyNoInteractions(appointmentRepository);
     }
 
 }
