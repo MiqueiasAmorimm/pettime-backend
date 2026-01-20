@@ -73,6 +73,7 @@ design patterns commonly used in real-world Spring Boot applications.
 
 Client → Controller → Service → Repository → Database
 
+
 ##📦 Main Features
 
 * User management with roles
@@ -82,7 +83,9 @@ Client → Controller → Service → Repository → Database
 * RESTful API design
 * Centralized error handling
 
+
 ##📡 API Examples
+
 POST /api/users
 
 {
@@ -106,6 +109,7 @@ mvn spring-boot:run
 👨‍💻 Author
 Miqueias Amorim
 Backend Java Developer
+
 
 
 
