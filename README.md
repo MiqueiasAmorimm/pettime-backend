@@ -69,7 +69,6 @@ boundaries between components:
 
 ```md
 ## 🧩 Architecture Diagram
-## 🧩 Architecture Diagram
 
 ```mermaid
 flowchart LR
@@ -106,18 +105,13 @@ flowchart LR
 
 ## 🔄 High-Level Flow
 
-Client sends an HTTP request to a REST controller
+1. Client sends an HTTP request to a REST controller  
+2. Controller validates input and maps requests to DTOs  
+3. Service layer executes business rules and domain validations  
+4. Repository layer interacts with the database via JPA  
+5. Domain entities are persisted and mapped back to response DTOs  
+6. Centralized exception handling ensures consistent error responses  
 
-
-Controller validates input and maps requests to DTOs
-
-Service layer executes business rules and domain validations
-
-Repository layer interacts with the database via JPA
-
-Domain entities are persisted and mapped back to response DTOs
-
-Centralized exception handling ensures consistent error responses
 
 Client → Controller → Service → Repository → Database
 📦 Main Features
@@ -215,6 +209,7 @@ Clean Architecture
 Automated Testing
 
 Scalable backend systems
+
 
 
 
