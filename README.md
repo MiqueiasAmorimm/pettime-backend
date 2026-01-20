@@ -104,8 +104,10 @@ flowchart LR
 
 ---
 
-🔄 High-Level Flow
+## 🔄 High-Level Flow
+
 Client sends an HTTP request to a REST controller
+
 
 Controller validates input and maps requests to DTOs
 
@@ -213,6 +215,7 @@ Clean Architecture
 Automated Testing
 
 Scalable backend systems
+
 
 
 
