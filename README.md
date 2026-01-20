@@ -87,7 +87,8 @@ flowchart LR
     
     ```md
 ---
-🔄 High-Level Flow
+
+## 🔄 High-Level Flow
 
 1. Client sends an HTTP request
 2. Controller validates input and maps DTOs
@@ -130,6 +131,7 @@ mvn spring-boot:run
 👨‍💻 Author
 Miqueias Amorim
 Backend Java Developer
+
 
 
 
