@@ -84,7 +84,9 @@ flowchart LR
     Service --> Repository
     Repository --> Database
     Service --> Exception
-
+    
+    ```md
+---
 🔄 High-Level Flow
 
 1. Client sends an HTTP request
@@ -128,4 +130,5 @@ mvn spring-boot:run
 👨‍💻 Author
 Miqueias Amorim
 Backend Java Developer
+
 
