@@ -93,9 +93,9 @@ POST /api/users
   "email": "john@example.com",
   "role": "CLIENT"
 }
+---
 
 ## 🧪 Testing Strategy
----
 
 * Controller tests (MockMvc)
 * Service tests (Mockito)
@@ -104,12 +104,14 @@ POST /api/users
 Run:
 mvn test
 
+
 ## ▶️ Running the Project
 mvn spring-boot:run
 
 👨‍💻 Author
 Miqueias Amorim
 Backend Java Developer
+
 
 
 
