@@ -109,9 +109,21 @@ mvn test
 mvn spring-boot:run
 ---
 
+## 🔮 Next Steps (Planned Improvements)
+
+- Dockerize the application
+- Add authentication (JWT / OAuth2)
+- Fully migrate to PostgreSQL
+- Introduce microservices concepts
+- Add Kafka for asynchronous events
+- Deploy to AWS
+- Add CI/CD pipeline (GitHub Actions)
+---
+
 ## 👨‍💻 Author
 Miqueias Amorim
 Backend Java Developer
+
 
 
 
