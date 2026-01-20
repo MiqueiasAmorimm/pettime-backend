@@ -74,7 +74,7 @@ design patterns commonly used in real-world Spring Boot applications.
 Client → Controller → Service → Repository → Database
 
 
-##📦 Main Features
+## 📦 Main Features
 
 * User management with roles
 * Pet management
@@ -84,7 +84,7 @@ Client → Controller → Service → Repository → Database
 * Centralized error handling
 
 
-##📡 API Examples
+## 📡 API Examples
 
 POST /api/users
 
@@ -94,7 +94,7 @@ POST /api/users
   "role": "CLIENT"
 }
 
-##🧪 Testing Strategy
+## 🧪 Testing Strategy
 
 * Controller tests (MockMvc)
 * Service tests (Mockito)
@@ -103,12 +103,13 @@ POST /api/users
 Run:
 mvn test
 
-##▶️ Running the Project
+## ▶️ Running the Project
 mvn spring-boot:run
 
 👨‍💻 Author
 Miqueias Amorim
 Backend Java Developer
+
 
 
 
