@@ -84,9 +84,6 @@ flowchart LR
     Service --> Repository
     Repository --> Database
     Service --> Exception
-    
-    
----
 
 ## 🔄 High-Level Flow
 
@@ -131,6 +128,7 @@ mvn spring-boot:run
 👨‍💻 Author
 Miqueias Amorim
 Backend Java Developer
+
 
 
 
