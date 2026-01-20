@@ -67,29 +67,30 @@ boundaries between components:
 
 ---
 
+```md
 ## 🧩 Architecture Diagram
 
 ```mermaid
 flowchart LR
-    Client[Client / API Consumer]
+    Client["Client / API Consumer"]
 
-    subgraph Web Layer
-        Controller[REST Controllers]
+    subgraph Web_Layer["Web Layer"]
+        Controller["REST Controllers"]
     end
 
-    subgraph Application Layer
-        Service[Business Services]
-        DTO[DTOs]
+    subgraph Application_Layer["Application Layer"]
+        Service["Business Services"]
+        DTO["DTOs"]
     end
 
-    subgraph Domain Layer
-        Entity[Domain Entities]
-        Exception[Business Exceptions]
+    subgraph Domain_Layer["Domain Layer"]
+        Entity["Domain Entities"]
+        Exception["Business Exceptions"]
     end
 
-    subgraph Infrastructure Layer
-        Repository[JPA Repositories]
-        Database[(Database)]
+    subgraph Infrastructure_Layer["Infrastructure Layer"]
+        Repository["JPA Repositories"]
+        Database[("Database")]
     end
 
     Client --> Controller
@@ -208,4 +209,5 @@ Clean Architecture
 Automated Testing
 
 Scalable backend systems
+
 
