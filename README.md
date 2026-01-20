@@ -102,7 +102,6 @@ flowchart LR
     Repository --> Database
     Service --> Exception
 
-```md
 ---
 
 🔄 High-Level Flow
@@ -214,6 +213,7 @@ Clean Architecture
 Automated Testing
 
 Scalable backend systems
+
 
 
 
