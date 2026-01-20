@@ -105,12 +105,14 @@ Run:
 mvn test
 
 
-## ▶️ Running the Project
+▶️ Running the Project
 mvn spring-boot:run
+---
 
-👨‍💻 Author
+## 👨‍💻 Author
 Miqueias Amorim
 Backend Java Developer
+
 
 
 
