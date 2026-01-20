@@ -61,7 +61,7 @@ design patterns commonly used in real-world Spring Boot applications.
     Service --> Repository
     Repository --> Database
     Service --> Exception
-
+---
 ## 🔄 High-Level Flow
 
 1. Client sends an HTTP request
@@ -72,7 +72,7 @@ design patterns commonly used in real-world Spring Boot applications.
 6. Exceptions are handled centrally
 
 Client → Controller → Service → Repository → Database
-
+---
 
 ## 📦 Main Features
 
@@ -82,7 +82,7 @@ Client → Controller → Service → Repository → Database
 * Conflict validation
 * RESTful API design
 * Centralized error handling
-
+---
 
 ## 📡 API Examples
 
@@ -95,6 +95,7 @@ POST /api/users
 }
 
 ## 🧪 Testing Strategy
+---
 
 * Controller tests (MockMvc)
 * Service tests (Mockito)
@@ -109,6 +110,7 @@ mvn spring-boot:run
 👨‍💻 Author
 Miqueias Amorim
 Backend Java Developer
+
 
 
 
