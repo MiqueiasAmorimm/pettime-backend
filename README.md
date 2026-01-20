@@ -1,109 +1,178 @@
 # PetTime 🐾
 
-PetTime is a backend REST API for managing pet services appointments, users, pets, and petshops.  
-This project was built as a **portfolio project** with a strong focus on **clean architecture, automated testing, and backend best practices** using Java and Spring Boot.
+![Java](https://img.shields.io/badge/Java-17-blue)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3-brightgreen)
+![Build](https://img.shields.io/badge/build-Maven-success)
+![Tests](https://img.shields.io/badge/tests-JUnit%20%7C%20Mockito-success)
+![Architecture](https://img.shields.io/badge/architecture-layered-blueviolet)
+![Status](https://img.shields.io/badge/status-active_development-yellow)
 
-> This project intentionally focuses on backend architecture and testing.  
-> Frontend, authentication, cloud deployment, and microservices are planned as next steps.
+PetTime is a backend REST API designed to manage pet service scheduling,
+including users, pets, petshops, and appointments.
+
+The project emphasizes clean architecture, testability, and scalable backend
+design patterns commonly used in real-world Spring Boot applications.
+It was built as a backend-focused portfolio project to demonstrate solid
+software engineering practices using Java.
+
+Frontend, authentication, cloud deployment, and distributed components are
+planned as future improvements.
 
 ---
 
 ## 🚀 Project Goals
 
-- Build a real-world backend application using **Spring Boot**
-- Apply **clean architecture principles**
-- Practice **unit, integration, and repository testing**
-- Serve as a solid **backend portfolio project** for Java developer positions
+- Build a real-world backend application using Spring Boot
+- Apply clean architecture and layered design principles
+- Implement business rules isolated from HTTP concerns
+- Practice automated testing across multiple layers
+- Serve as a strong backend portfolio project for Java developer positions
 
 ---
 
 ## 🛠 Tech Stack
 
-- **Java 17**
-- **Spring Boot 3**
-- **Spring Web (REST APIs)**
-- **Spring Data JPA**
-- **Hibernate**
-- **H2 (tests)**
-- **PostgreSQL (ready for production)**
-- **JUnit 5**
-- **Mockito**
-- **Maven**
+- Java 17
+- Spring Boot 3
+- Spring Web (REST APIs)
+- Spring Data JPA
+- Hibernate
+- H2 (integration and repository tests)
+- PostgreSQL (production-ready)
+- JUnit 5
+- Mockito
+- Maven
 
 ---
 
 ## 🧱 Architecture Overview
 
-The project follows a **layered architecture**:
+The project follows a layered architecture with clear responsibility
+boundaries between components:
 
-- **controller** → REST endpoints
-- **service** → business logic
-- **repository** → data access (JPA)
-- **dto** → request / response objects
+- **controller** → REST endpoints and request handling
+- **service** → business logic and validations
+- **repository** → data access layer (JPA)
+- **dto** → request and response contracts
 - **model** → domain entities
-- **exception** → custom business exceptions
+- **exception** → custom business exceptions and error handling
 
-Key principles applied:
+### Key principles applied
 
 - Separation of concerns
-- DTOs to isolate API contracts
-- Custom business exceptions
+- DTO-based API contracts
+- Business rules isolated in the service layer
 - Centralized exception handling
 - Clear responsibility per layer
 
-### High-level flow
-
-Client
-|
-Controller
-|
-Service
-|
-Repository
-|
-Database
-
-
 ---
 
-## 📦 Main Features
+## 🧩 Architecture Diagram
 
-- User management with roles (**ADMIN**, **CLIENT**, **PETSHOP**)
-- Pet management linked to owners
-- Appointment scheduling
-- Appointment conflict validation
-- RESTful API design
-- Validation with Jakarta Validation
-- Centralized error handling
+```mermaid
+flowchart LR
+    Client[Client / API Consumer]
 
----
+    subgraph Web Layer
+        Controller[REST Controllers]
+    end
 
-## 📡 API Examples
+    subgraph Application Layer
+        Service[Business Services]
+        DTO[DTOs]
+    end
 
-Some example endpoints exposed by the API:
+    subgraph Domain Layer
+        Entity[Domain Entities]
+        Exception[Business Exceptions]
+    end
 
+    subgraph Infrastructure Layer
+        Repository[JPA Repositories]
+        Database[(Database)]
+    end
+
+    Client --> Controller
+    Controller --> DTO
+    Controller --> Service
+    Service --> Entity
+    Service --> Repository
+    Repository --> Database
+    Service --> Exception
+🔄 High-Level Flow
+Client sends an HTTP request to a REST controller
+
+Controller validates input and maps requests to DTOs
+
+Service layer executes business rules and domain validations
+
+Repository layer interacts with the database via JPA
+
+Domain entities are persisted and mapped back to response DTOs
+
+Centralized exception handling ensures consistent error responses
+
+Client → Controller → Service → Repository → Database
+📦 Main Features
+User management with roles (ADMIN, CLIENT, PETSHOP)
+
+Pet management linked to owners
+
+Appointment scheduling
+
+Appointment conflict validation per petshop
+
+RESTful API design
+
+Input validation with Jakarta Validation
+
+Centralized and consistent error handling
+
+📡 API Examples
+Create User
 POST /api/users
-GET /api/users
+
+Request body:
+
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "role": "CLIENT"
+}
+Response:
+
+{
+  "id": 1,
+  "name": "John Doe",
+  "email": "john@example.com",
+  "role": "CLIENT"
+}
+Get User by ID
 GET /api/users/{id}
-GET /api/users/email?email=
-POST /appointments
 
+Response:
 
----
+{
+  "id": 1,
+  "name": "John Doe",
+  "email": "john@example.com",
+  "role": "CLIENT"
+}
+🧪 Testing Strategy
+The project includes extensive automated tests covering multiple layers:
 
-## 🧪 Testing Strategy
+Controller tests using MockMvc
 
-This project includes **extensive automated tests**, covering multiple layers:
+Service unit tests using Mockito
 
-- **Controller tests** using MockMvc
-- **Service unit tests** with Mockito
-- **Repository integration tests** using H2 in-memory database
-- **Model and validation tests**
-- **Custom exception tests**
+Repository integration tests using H2 in-memory database
+
+Model and validation tests
+
+Custom business exception tests
 
 Run all tests with:
 
-```bash
 mvn test
 ▶️ Running the Project
 Run the application locally with:
@@ -111,7 +180,7 @@ Run the application locally with:
 mvn spring-boot:run
 Default active profile: dev
 
-🔮 Next Steps (Planned Improvements)
+🔮 Planned Improvements
 Dockerize the application
 
 Add authentication (JWT / OAuth2)
@@ -124,11 +193,11 @@ Add Kafka for asynchronous events
 
 Deploy to AWS
 
-Add CI/CD pipeline (GitHub Actions)
+Add CI/CD pipeline using GitHub Actions
 
 👨‍💻 Author
 Miqueias Amorim
-Backend Java Developer (in progress)
+Backend Java Developer
 
 Focused on:
 
@@ -139,3 +208,4 @@ Clean Architecture
 Automated Testing
 
 Scalable backend systems
+
