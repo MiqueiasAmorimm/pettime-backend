@@ -48,4 +48,5 @@ class AppointmentValidationTest {
         assertThat(appointment.getEndTime())
                 .isAfter(appointment.getStartTime());
     }
+    
 }
