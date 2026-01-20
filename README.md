@@ -54,29 +54,6 @@ design patterns commonly used in real-world Spring Boot applications.
 
 ## 🧩 Architecture Diagram
 
-```mermaid
-flowchart LR
-    Client["Client / API Consumer"]
-
-    subgraph Web["Web Layer"]
-        Controller["REST Controllers"]
-    end
-
-    subgraph App["Application Layer"]
-        Service["Business Services"]
-        DTO["DTOs"]
-    end
-
-    subgraph Domain["Domain Layer"]
-        Entity["Entities"]
-        Exception["Business Exceptions"]
-    end
-
-    subgraph Infra["Infrastructure Layer"]
-        Repository["JPA Repositories"]
-        Database[("Database")]
-    end
-
     Client --> Controller
     Controller --> DTO
     Controller --> Service
@@ -128,6 +105,7 @@ mvn spring-boot:run
 👨‍💻 Author
 Miqueias Amorim
 Backend Java Developer
+
 
 
 
