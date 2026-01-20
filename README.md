@@ -69,6 +69,7 @@ boundaries between components:
 
 ```md
 ## 🧩 Architecture Diagram
+## 🧩 Architecture Diagram
 
 ```mermaid
 flowchart LR
@@ -100,6 +101,10 @@ flowchart LR
     Service --> Repository
     Repository --> Database
     Service --> Exception
+
+```md
+---
+
 🔄 High-Level Flow
 Client sends an HTTP request to a REST controller
 
@@ -209,5 +214,6 @@ Clean Architecture
 Automated Testing
 
 Scalable backend systems
+
 
 
