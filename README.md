@@ -1,3 +1,4 @@
+```md
 # PetTime 🐾
 
 ![Java](https://img.shields.io/badge/Java-17-blue)
@@ -12,11 +13,6 @@ including users, pets, petshops, and appointments.
 
 The project emphasizes clean architecture, testability, and scalable backend
 design patterns commonly used in real-world Spring Boot applications.
-It was built as a backend-focused portfolio project to demonstrate solid
-software engineering practices using Java.
-
-Frontend, authentication, cloud deployment, and distributed components are
-planned as future improvements.
 
 ---
 
@@ -34,10 +30,10 @@ planned as future improvements.
 
 - Java 17
 - Spring Boot 3
-- Spring Web (REST APIs)
+- Spring Web
 - Spring Data JPA
 - Hibernate
-- H2 (integration and repository tests)
+- H2 (tests)
 - PostgreSQL (production-ready)
 - JUnit 5
 - Mockito
@@ -47,48 +43,36 @@ planned as future improvements.
 
 ## 🧱 Architecture Overview
 
-The project follows a layered architecture with clear responsibility
-boundaries between components:
-
-- **controller** → REST endpoints and request handling
-- **service** → business logic and validations
-- **repository** → data access layer (JPA)
-- **dto** → request and response contracts
-- **model** → domain entities
-- **exception** → custom business exceptions and error handling
-
-### Key principles applied
-
-- Separation of concerns
-- DTO-based API contracts
-- Business rules isolated in the service layer
-- Centralized exception handling
-- Clear responsibility per layer
+- **controller** → REST endpoints  
+- **service** → business logic  
+- **repository** → data access  
+- **dto** → API contracts  
+- **model** → domain entities  
+- **exception** → centralized error handling  
 
 ---
 
-```md
 ## 🧩 Architecture Diagram
 
 ```mermaid
 flowchart LR
     Client["Client / API Consumer"]
 
-    subgraph Web_Layer["Web Layer"]
+    subgraph Web["Web Layer"]
         Controller["REST Controllers"]
     end
 
-    subgraph Application_Layer["Application Layer"]
+    subgraph App["Application Layer"]
         Service["Business Services"]
         DTO["DTOs"]
     end
 
-    subgraph Domain_Layer["Domain Layer"]
-        Entity["Domain Entities"]
+    subgraph Domain["Domain Layer"]
+        Entity["Entities"]
         Exception["Business Exceptions"]
     end
 
-    subgraph Infrastructure_Layer["Infrastructure Layer"]
+    subgraph Infra["Infrastructure Layer"]
         Repository["JPA Repositories"]
         Database[("Database")]
     end
@@ -101,117 +85,47 @@ flowchart LR
     Repository --> Database
     Service --> Exception
 
----
+🔄 High-Level Flow
 
-## 🔄 High-Level Flow
-
-1. Client sends an HTTP request to a REST controller  
-2. Controller validates input and maps requests to DTOs  
-3. Service layer executes business rules and domain validations  
-4. Repository layer interacts with the database via JPA  
-5. Domain entities are persisted and mapped back to response DTOs  
-6. Centralized exception handling ensures consistent error responses  
-
+1. Client sends an HTTP request
+2. Controller validates input and maps DTOs
+3. Service executes business rules
+4. Repository interacts with the database
+5. Entities are persisted and mapped to responses
+6. Exceptions are handled centrally
 
 Client → Controller → Service → Repository → Database
+
 📦 Main Features
-User management with roles (ADMIN, CLIENT, PETSHOP)
 
-Pet management linked to owners
-
-Appointment scheduling
-
-Appointment conflict validation per petshop
-
-RESTful API design
-
-Input validation with Jakarta Validation
-
-Centralized and consistent error handling
+* User management with roles
+* Pet management
+* Appointment scheduling
+* Conflict validation
+* RESTful API design
+* Centralized error handling
 
 📡 API Examples
-Create User
 POST /api/users
 
-Request body:
-
 {
-  "name": "John Doe",
-  "email": "john@example.com",
-  "role": "CLIENT"
-}
-Response:
-
-{
-  "id": 1,
-  "name": "John Doe",
-  "email": "john@example.com",
-  "role": "CLIENT"
-}
-Get User by ID
-GET /api/users/{id}
-
-Response:
-
-{
-  "id": 1,
   "name": "John Doe",
   "email": "john@example.com",
   "role": "CLIENT"
 }
 🧪 Testing Strategy
-The project includes extensive automated tests covering multiple layers:
 
-Controller tests using MockMvc
+* Controller tests (MockMvc)
+* Service tests (Mockito)
+* Repository tests (H2)
 
-Service unit tests using Mockito
-
-Repository integration tests using H2 in-memory database
-
-Model and validation tests
-
-Custom business exception tests
-
-Run all tests with:
-
+Run:
 mvn test
+
 ▶️ Running the Project
-Run the application locally with:
-
 mvn spring-boot:run
-Default active profile: dev
-
-🔮 Planned Improvements
-Dockerize the application
-
-Add authentication (JWT / OAuth2)
-
-Fully migrate to PostgreSQL
-
-Introduce microservices concepts
-
-Add Kafka for asynchronous events
-
-Deploy to AWS
-
-Add CI/CD pipeline using GitHub Actions
 
 👨‍💻 Author
 Miqueias Amorim
 Backend Java Developer
-
-Focused on:
-
-Java & Spring Boot
-
-Clean Architecture
-
-Automated Testing
-
-Scalable backend systems
-
-
-
-
-
 
