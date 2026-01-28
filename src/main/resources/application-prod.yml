@@ -1,0 +1,17 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/pettime
+    username: pettime
+    password: ${DB_PASSWORD}
+
+firebase:
+  credentials:
+    path: ${FIREBASE_CREDENTIALS_PATH}
+
+app:
+  stripe:
+    secret-key: ${STRIPE_SECRET_KEY}
+    public-key: ${STRIPE_PUBLIC_KEY}

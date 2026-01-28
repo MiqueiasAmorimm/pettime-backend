@@ -1,0 +1,27 @@
+server:
+  port: 8081
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:pettime
+    username: sa
+    password: password
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  security:
+    user:
+      name: dev
+      password: dev123
+
+firebase:
+  credentials:
+    path: classpath:firebase-service-account.json
+
+app:
+  stripe:
+    secret-key: YOUR_STRIPE_SECRET_KEY
+    public-key: YOUR_STRIPE_PUBLIC_KEY
