@@ -9,7 +9,7 @@
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>petime</name>
+    <name>pettime</name>
     <description>PetTime Backend</description>
 
     <parent>

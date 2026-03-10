@@ -21,6 +21,7 @@ serviceAccount*.json
 
 # Environment-specific config (YAML only in repo)
 # Secrets must come from env vars
+.env
 *.env
 
 ### Local H2 database / Base de données locale H2
