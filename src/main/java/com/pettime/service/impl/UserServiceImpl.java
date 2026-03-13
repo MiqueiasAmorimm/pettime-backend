@@ -1,6 +1,7 @@
 package com.pettime.service.impl;
 
-import com.pettime.dto.UserDto;
+import com.pettime.dto.UserRequestDto;
+import com.pettime.dto.UserResponseDto;
 import com.pettime.exception.EmailAlreadyExistsException;
 import com.pettime.exception.InvalidUserDataException;
 import com.pettime.exception.ResourceNotFoundException;
@@ -32,13 +33,11 @@ public class UserServiceImpl implements UserService {
     // Helpers
     // ---------------------------------------------------------------
 
-    private UserDto toSafeDto(User user) {
-        UserDto dto = UserDto.fromEntity(user);
-        dto.setPassword(null);
-        return dto;
+    private UserResponseDto toSafeDto(User user) {
+        return UserResponseDto.fromEntity(user);
     }
 
-    private void validateCreate(UserDto dto) {
+    private void validateCreate(UserRequestDto dto) {
 
         if (dto.getEmail() == null || dto.getEmail().isBlank()) {
             throw new InvalidUserDataException("Email cannot be empty");
@@ -52,12 +51,10 @@ public class UserServiceImpl implements UserService {
             throw new InvalidUserDataException("Name cannot be empty");
         }
 
-        if (dto.getRole() == null) {
-            throw new InvalidUserDataException("Role cannot be null");
-        }
+
     }
 
-    private void validateUpdate(Long id, UserDto dto) {
+    private void validateUpdate(Long id, UserRequestDto dto) {
 
         if (dto.getEmail() == null || dto.getEmail().isBlank()) {
             throw new InvalidUserDataException("Email cannot be empty");
@@ -75,9 +72,7 @@ public class UserServiceImpl implements UserService {
             throw new InvalidUserDataException("Name cannot be empty");
         }
 
-        if (dto.getRole() == null) {
-            throw new InvalidUserDataException("Role cannot be null");
-        }
+
     }
 
     // ---------------------------------------------------------------
@@ -85,7 +80,7 @@ public class UserServiceImpl implements UserService {
     // ---------------------------------------------------------------
 
     @Override
-    public List<UserDto> findAll() {
+    public List<UserResponseDto> findAll() {
         log.info("Fetching all users");
         return userRepository.findAll()
                 .stream()
@@ -94,14 +89,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<UserDto> findById(Long id) {
+    public Optional<UserResponseDto> findById(Long id) {
         log.info("Fetching user by ID: {}", id);
         return userRepository.findById(id)
                 .map(this::toSafeDto);
     }
 
     @Override
-    public Optional<UserDto> findByEmail(String email) {
+    public Optional<UserResponseDto> findByEmail(String email) {
         log.info("Fetching user by email: {}", email);
         return userRepository.findByEmail(email)
                 .map(this::toSafeDto);
@@ -109,7 +104,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public UserDto createUser(UserDto dto) {
+    public UserResponseDto createUser(UserRequestDto dto) {
         log.info("Creating new user: {}", dto.getEmail());
 
         validateCreate(dto);
@@ -125,7 +120,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public Optional<UserDto> updateUser(Long id, UserDto dto) {
+    public Optional<UserResponseDto> updateUser(Long id, UserRequestDto dto) {
         log.info("Updating user ID: {}", id);
 
         validateUpdate(id, dto);
@@ -135,7 +130,7 @@ public class UserServiceImpl implements UserService {
 
                     existing.setName(dto.getName());
                     existing.setEmail(dto.getEmail());
-                    existing.setRole(dto.getRole());
+
 
                     if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
                         existing.setPassword(passwordEncoder.encode(dto.getPassword()));

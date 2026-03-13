@@ -1,21 +1,22 @@
 package com.pettime.service;
 
-import com.pettime.dto.UserDto;
+import com.pettime.dto.UserRequestDto;
+import com.pettime.dto.UserResponseDto;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface UserService {
 
-    List<UserDto> findAll();
+    List<UserResponseDto> findAll();
 
-    Optional<UserDto> findById(Long id);
+    Optional<UserResponseDto> findById(Long id);
 
-    Optional<UserDto> findByEmail(String email);
+    Optional<UserResponseDto> findByEmail(String email);
 
-    UserDto createUser(UserDto dto);
+    UserResponseDto createUser(UserRequestDto dto);
 
-    Optional<UserDto> updateUser(Long id, UserDto dto);
+    Optional<UserResponseDto> updateUser(Long id, UserRequestDto dto);
 
     boolean deleteUser(Long id);
 }
