@@ -1,7 +1,8 @@
 package com.pettime.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pettime.dto.UserDto;
+import com.pettime.dto.UserRequestDto;
+import com.pettime.dto.UserResponseDto;
 import com.pettime.model.UserRole;
 import com.pettime.service.UserService;
 import org.junit.jupiter.api.Test;
@@ -33,19 +34,25 @@ class UserControllerTest {
     @Test
     void shouldCreateUserWithClientRole() throws Exception {
 
-        UserDto dto = UserDto.builder()
+        UserRequestDto requestDto = UserRequestDto.builder()
                 .name("Alice")
                 .email("alice@test.com")
                 .password("12345")
+                .build();
+
+        UserResponseDto responseDto = UserResponseDto.builder()
+                .id(1L)
+                .name("Alice")
+                .email("alice@test.com")
                 .role(UserRole.CLIENT)
                 .build();
 
-        when(userService.createUser(any(UserDto.class)))
-                .thenReturn(dto);
+        when(userService.createUser(any(UserRequestDto.class)))
+                .thenReturn(responseDto);
 
         mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
+                        .content(objectMapper.writeValueAsString(requestDto)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.role").value("CLIENT"))
                 .andExpect(jsonPath("$.name").value("Alice"))

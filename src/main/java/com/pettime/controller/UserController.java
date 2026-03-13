@@ -1,6 +1,7 @@
 package com.pettime.controller;
 
-import com.pettime.dto.UserDto;
+import com.pettime.dto.UserRequestDto;
+import com.pettime.dto.UserResponseDto;
 import com.pettime.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -36,7 +37,7 @@ public class UserController {
             description = "Retrieves all registered users"
     )
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<UserDto>> getAllUsers() {
+    public ResponseEntity<List<UserResponseDto>> getAllUsers() {
         return ResponseEntity.ok(userService.findAll());
     }
 
@@ -48,7 +49,7 @@ public class UserController {
             description = "Retrieves a user by its unique identifier"
     )
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
+    public ResponseEntity<UserResponseDto> getUserById(@PathVariable Long id) {
         return userService.findById(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
@@ -62,7 +63,7 @@ public class UserController {
             description = "Retrieves a user by email address"
     )
     @GetMapping(value = "/email", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserDto> getUserByEmail(@RequestParam String email) {
+    public ResponseEntity<UserResponseDto> getUserByEmail(@RequestParam String email) {
         return userService.findByEmail(email)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
@@ -76,8 +77,8 @@ public class UserController {
             description = "Creates a new user in the system"
     )
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserDto> createUser(@Valid @RequestBody UserDto userDto) {
-        UserDto created = userService.createUser(userDto);
+    public ResponseEntity<UserResponseDto> createUser(@Valid @RequestBody UserRequestDto userRequestDto) {
+        UserResponseDto created = userService.createUser(userRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
@@ -89,8 +90,11 @@ public class UserController {
             description = "Updates an existing user by its identifier"
     )
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @Valid @RequestBody UserDto userDto) {
-        return userService.updateUser(id, userDto)
+    public ResponseEntity<UserResponseDto> updateUser(
+            @PathVariable Long id,
+            @Valid @RequestBody UserRequestDto userRequestDto
+    ) {
+        return userService.updateUser(id, userRequestDto)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
