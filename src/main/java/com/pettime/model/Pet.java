@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -25,6 +26,7 @@ public class Pet {
     private String species;
 
     private String breed;
+
     private Integer age;
 
     @ManyToOne(fetch = FetchType.LAZY)
