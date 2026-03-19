@@ -10,7 +10,6 @@ import lombok.*;
 @Builder
 public class UserRequestDto {
 
-    private Long id;
 
     @NotBlank(message = "Name is required")
     private String name;
