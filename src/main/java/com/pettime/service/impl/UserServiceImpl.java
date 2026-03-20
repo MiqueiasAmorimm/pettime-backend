@@ -5,6 +5,7 @@ import com.pettime.dto.UserResponseDto;
 import com.pettime.exception.EmailAlreadyExistsException;
 import com.pettime.exception.InvalidUserDataException;
 import com.pettime.exception.ResourceNotFoundException;
+import com.pettime.mapper.UserMapper;
 import com.pettime.model.User;
 import com.pettime.repository.UserRepository;
 import com.pettime.service.UserService;
@@ -29,12 +30,8 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    // ---------------------------------------------------------------
-    // Helpers
-    // ---------------------------------------------------------------
-
     private UserResponseDto toSafeDto(User user) {
-        return UserResponseDto.fromEntity(user);
+        return UserMapper.toResponseDto(user);
     }
 
     private void validateCreate(UserRequestDto dto) {
@@ -50,8 +47,6 @@ public class UserServiceImpl implements UserService {
         if (dto.getName() == null || dto.getName().isBlank()) {
             throw new InvalidUserDataException("Name cannot be empty");
         }
-
-
     }
 
     private void validateUpdate(Long id, UserRequestDto dto) {
@@ -60,7 +55,6 @@ public class UserServiceImpl implements UserService {
             throw new InvalidUserDataException("Email cannot be empty");
         }
 
-        // only throw if email belongs to a DIFFERENT user
         userRepository.findByEmail(dto.getEmail())
                 .ifPresent(existing -> {
                     if (!existing.getId().equals(id)) {
@@ -71,13 +65,7 @@ public class UserServiceImpl implements UserService {
         if (dto.getName() == null || dto.getName().isBlank()) {
             throw new InvalidUserDataException("Name cannot be empty");
         }
-
-
     }
-
-    // ---------------------------------------------------------------
-    // Service methods
-    // ---------------------------------------------------------------
 
     @Override
     public List<UserResponseDto> findAll() {
@@ -109,7 +97,7 @@ public class UserServiceImpl implements UserService {
 
         validateCreate(dto);
 
-        User entity = dto.toEntity();
+        User entity = UserMapper.toEntity(dto);
         entity.setPassword(passwordEncoder.encode(dto.getPassword()));
 
         User saved = userRepository.save(entity);
@@ -127,10 +115,8 @@ public class UserServiceImpl implements UserService {
 
         return userRepository.findById(id)
                 .map(existing -> {
-
                     existing.setName(dto.getName());
                     existing.setEmail(dto.getEmail());
-
 
                     if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
                         existing.setPassword(passwordEncoder.encode(dto.getPassword()));
